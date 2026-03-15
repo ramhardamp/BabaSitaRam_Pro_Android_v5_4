@@ -1,0 +1,76 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BabaSitaRam-Pro-Debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BabaSitaRam-Pro-Release
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
+          retention-days: 30
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          name: "BabaSitaRam Pro v5.4 - Build ${{ github.run_number }}"
+          body: |
+            ## BabaSitaRam Pro Android App
+            
+            ### Features:
+            - ✅ System-wide AutoFill (sabhi apps mein)
+            - ✅ Biometric Face/Fingerprint unlock
+            - ✅ Samsung AutoFill compatible
+            - ✅ Default AutoFill provider support
+            - ✅ AES-256-GCM Encryption
+            - ✅ Material Design 3 Dark UI
+            
+            ### Install:
+            1. `BabaSitaRam-Pro-Debug.apk` download karo
+            2. Settings → Unknown sources ON karo
+            3. APK install karo
+            4. Settings → Passwords → AutoFill service → BSR Pro select karo
+          files: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/release/app-release-unsigned.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
