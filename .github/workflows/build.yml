@@ -27,11 +27,32 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Generate Debug Keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore app/debug.keystore \
+            -alias androiddebugkey \
+            -keyalg RSA -keysize 2048 \
+            -validity 10000 \
+            -storepass android \
+            -keypass android \
+            -dname "CN=BabaSitaRam, OU=Dev, O=BSR, L=IN, S=IN, C=IN"
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug
+        env:
+          KEYSTORE_PATH: debug.keystore
+          KEYSTORE_PASSWORD: android
+          KEY_ALIAS: androiddebugkey
+          KEY_PASSWORD: android
 
       - name: Build Release APK
         run: ./gradlew assembleRelease
+        env:
+          KEYSTORE_PATH: debug.keystore
+          KEYSTORE_PASSWORD: android
+          KEY_ALIAS: androiddebugkey
+          KEY_PASSWORD: android
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
