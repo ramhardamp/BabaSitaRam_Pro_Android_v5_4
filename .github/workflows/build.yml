@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,22 +20,17 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: Setup Gradle
+      - name: Setup Gradle 8.2
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.2'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: gradle assembleDebug --no-daemon --stacktrace
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon
-        continue-on-error: true
+      - name: Find APK
+        run: find . -name "*.apk" -type f
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
@@ -44,15 +39,7 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: BabaSitaRam-Pro-Release-APK
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
-          retention-days: 30
-          if-no-files-found: ignore
-
-      - name: Create GitHub Release
+      - name: Create Release
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: softprops/action-gh-release@v1
         with:
@@ -60,21 +47,13 @@ jobs:
           name: "BabaSitaRam Pro Android v5.0 — Build ${{ github.run_number }}"
           body: |
             ## BabaSitaRam Pro Android v5.0
-            
-            ### ✅ Features:
-            - System-wide AutoFill (sabhi apps)
-            - Biometric Face/Fingerprint unlock
-            - AES-256-GCM Encryption
-            - BSR-PRO-v5 Backup format (.bsrpro)
-            - Cross-platform: Extension ↔ APK backup
-            - Password Generator + Health Check
-            - Categories + Favorites
-            
-            ### 📲 Install:
-            1. `BabaSitaRam-Pro-Debug-APK` download karo
-            2. Settings → Unknown sources ON
-            3. APK install karo
-            4. Settings → AutoFill → BSR Pro select karo
+            ✅ AutoFill (sabhi apps)
+            ✅ Biometric Face/Fingerprint  
+            ✅ AES-256-GCM Encryption
+            ✅ BSR-PRO-v5 Backup (.bsrpro)
+            ✅ Password Generator + Health
+
+            📲 Install: APK download karo → Unknown sources ON → Install → Settings mein AutoFill → BSR Pro select karo
           files: app/build/outputs/apk/debug/app-debug.apk
           draft: false
           prerelease: false
