@@ -91,8 +91,8 @@
     <Button android:id="@+id/btnResetVault" android:layout_width="match_parent"
         android:layout_height="52dp" android:text="⚠️ Reset Vault (Delete All)"
         android:layout_marginBottom="20dp"
-        android:backgroundTint="#3Df87171"
-        android:textColor="#FFf87171"/>
+        android:backgroundTint="#55f87171"
+        android:textColor="#f87171"/>
 
     <TextView android:id="@+id/tvVersion" android:layout_width="wrap_content"
         android:layout_height="wrap_content" android:layout_gravity="center"
